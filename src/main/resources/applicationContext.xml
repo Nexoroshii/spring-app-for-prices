@@ -10,16 +10,20 @@
     <context:property-placeholder location="classpath:musicPlayer.properties"/>
 
     <bean id="musicBean"
-          class="com.emoisei.springcourse.ClassicalMusic">
+          class="com.emoisei.springcourse.ClassicalMusic"
+        init-method="doMyInit"
+        destroy-method="doMyDestroy"
+    scope="prototype">
+
 
     </bean >
 
-    <bean id="musicPlayer"
-    class="com.emoisei.springcourse.MusicPlayer">
-        <property name="music" ref="musicBean"/>
+<!--    <bean id="musicPlayer"-->
+<!--    class="com.emoisei.springcourse.MusicPlayer">-->
+<!--        <property name="music" ref="musicBean"/>-->
 
-        <property name="name" value="${musicPlayer.name}"/>
-        <property name="volume" value="${musicPlayer.volume}"/>
-    </bean>
+<!--        <property name="name" value="${musicPlayer.name}"/>-->
+<!--        <property name="volume" value="${musicPlayer.volume}"/>-->
+<!--    </bean>-->
 
 </beans>
