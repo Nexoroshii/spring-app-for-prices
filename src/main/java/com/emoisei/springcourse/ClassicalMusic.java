@@ -7,16 +7,18 @@ import java.util.List;
 
 @Component
 public class ClassicalMusic implements Music {
- private List<String> songs = new ArrayList<>();
+    private List<String> songs = new ArrayList<>();
+
+    // Блок инициализации объекта (англ. Instance initialization block)
+    // Выполняется каждый раз, когда создается объект класса
     {
-        songs.add("classical1");
-        songs.add("classical2");
-        songs.add("classical3");
+        songs.add("Hungarian Rhapsody");
+        songs.add("Symphony no. 5 in C Minor, op. 67");
+        songs.add("Night on Bald Mountain");
     }
+
     @Override
     public List<String> getSongs() {
         return songs;
     }
-
-
 }
