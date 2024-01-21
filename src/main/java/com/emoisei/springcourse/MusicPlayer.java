@@ -1,45 +1,38 @@
 package com.emoisei.springcourse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+@Component
 public class MusicPlayer {
-    private List<Music> musicList = new ArrayList<>();
-    private Music music;
 
-    private String name;
-    private int volume;
-
-    public String getName() {
-        return name;
+  private ClassicalMusic classicalMusic;
+  private RockMusic rockMusic;
+@Autowired
+    public MusicPlayer(@Qualifier("rockMusic") RockMusic rockMusic,
+                       @Qualifier("classicalMusic") ClassicalMusic classicalMusic) {
+        this.rockMusic = rockMusic;
+        this.classicalMusic = classicalMusic;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void playMusic(MusicGenre genre) {
+        Random random = new Random();
 
-    public int getVolume() {
-        return volume;
-    }
+        int randomNumber = random.nextInt(3);
 
-    public void setVolume(int volume) {
-        this.volume = volume;
-    }
+        if(genre == MusicGenre.CLASSICAL){
+            System.out.println(classicalMusic.getSongs().get(randomNumber));
+        }
+        else{
+            System.out.println(rockMusic.getSongs().get(randomNumber));
+        }
 
-    public MusicPlayer(Music music){
-        this.music = music;
-    }
 
-    public MusicPlayer(){
-
-    }
-
-    public void setMusic(Music music) {
-        this.music = music;
-    }
-
-    public void playMusic() {
-        System.out.println("Playing: " + music.getSong());
 
     }
 }
