@@ -22,10 +22,11 @@ public class WorkWithTables {
     static Map<String, double[]> keRedlandsSortedMap = new TreeMap<>();
     static Map<String, double[]> subSortedMap = new HashMap<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Workbook wb = openFile();
         Sheet sheet = wb.getSheetAt(0);
         JsonNode json = getJsonFromSheet(sheet);
+        System.out.println(json.toString());
         getAllMaps(json);
         openAndWriteToFile(wb);
     }
@@ -100,7 +101,14 @@ public class WorkWithTables {
     }
 
     public static void addInMap(Map<String, double[]> currMap, String name, double amount, int quantity) {
-        if (currMap.containsKey(name)) {
+        boolean found = false;
+        for (String key : currMap.keySet()) {
+            if (key.equalsIgnoreCase(name.toLowerCase())) {
+                found=true;
+                break;
+            }
+        }
+        if (found) {
             // Если есть, то прибавить значение "amount" к существующему значению
             currMap.computeIfPresent(name, (k, acc) -> new double[]{acc[0] + amount, acc[1] + quantity});
         } else {
@@ -110,7 +118,8 @@ public class WorkWithTables {
     }
 
     private static boolean checkIfSub(String element) {
-        String regex2 = ".*[A-Z]{2,}";
+        //String regex2 = ".*[A-Z]{2,}";
+        String regex2 = "^[A-Z]{2,}\\s.*";
         boolean isMatch = element.matches(regex2);
         boolean isMatch2 = element.contains("+");
         return isMatch || isMatch2;
