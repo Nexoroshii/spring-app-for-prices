@@ -14,19 +14,18 @@ import java.util.*;
  * @author Maiseichyk_YA
  */
 public class WorkWithTables {
-    static Map<String, double[]> ecSortedMap = new TreeMap<>();
-    static Map<String, double[]> coSortedMap = new TreeMap<>();
-    static Map<String, double[]> ilSortedMap = new TreeMap<>();
-    static Map<String, double[]> keSingleSortedMap = new TreeMap<>();
-    static Map<String, double[]> keSpraySortedMap = new TreeMap<>();
-    static Map<String, double[]> keRedlandsSortedMap = new TreeMap<>();
-    static Map<String, double[]> subSortedMap = new HashMap<>();
+    static Map<String, double[]> ecSortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    static Map<String, double[]> coSortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    static Map<String, double[]> ilSortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    static Map<String, double[]> keSingleSortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    static Map<String, double[]> keSpraySortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    static Map<String, double[]> keRedlandsSortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    static Map<String, double[]> subSortedMap = new LinkedHashMap<>();
 
     public static void main(String[] args) throws IOException {
         Workbook wb = openFile();
         Sheet sheet = wb.getSheetAt(0);
         JsonNode json = getJsonFromSheet(sheet);
-        System.out.println(json.toString());
         getAllMaps(json);
         openAndWriteToFile(wb);
     }
@@ -73,6 +72,7 @@ public class WorkWithTables {
             int quantity = elem.get("quantity").asInt();
             int label = elem.get("label").asInt();
             if (checkIfSub(name)) {
+                name = normalizeSubName(name);
                 addInMap(subSortedMap, name, amount, quantity);
             } else {
                 if (label == 1) {
@@ -100,11 +100,17 @@ public class WorkWithTables {
         }
     }
 
+    private static String normalizeSubName(String name) {
+        String firstWord = getFirstWord(name);
+        String restOfString = name.substring(firstWord.length()).toLowerCase();
+        return firstWord + restOfString;
+    }
+
     public static void addInMap(Map<String, double[]> currMap, String name, double amount, int quantity) {
         boolean found = false;
         for (String key : currMap.keySet()) {
             if (key.equalsIgnoreCase(name.toLowerCase())) {
-                found=true;
+                found = true;
                 break;
             }
         }
@@ -273,9 +279,9 @@ public class WorkWithTables {
         for (Map.Entry<String, double[]> entry : list) {
             double[] acc = entry.getValue();
             Cell cell;
-            if (!entry.getKey().substring(entry.getKey().lastIndexOf(' ') + 1).equals(subName)) {
+            if (!entry.getKey().substring(0, entry.getKey().indexOf(' ')).equals(subName)) {
                 Row headerRow1 = sheet.createRow(currRow);
-                subName = entry.getKey().substring(entry.getKey().lastIndexOf(' ') + 1);
+                subName = entry.getKey().substring(0, entry.getKey().indexOf(' '));
                 cell = headerRow1.createCell(0);
                 cell.setCellValue(subName);
                 currRow++;
@@ -301,28 +307,23 @@ public class WorkWithTables {
 
     private static List<Map.Entry<String, double[]>> workWithSubMap(Map<String, double[]> map) {
         List<Map.Entry<String, double[]>> list = new ArrayList<>(map.entrySet());
-        // Создаем компаратор для сравнения по последнему слову в ключе и алфавиту
+        // Создаем компаратор для сравнения по первому слову в ключе и алфавиту
         Comparator<Map.Entry<String, double[]>> comparator = new Comparator<Map.Entry<String, double[]>>() {
-            public int compare(Map.Entry<String, double[]> entry1, Map.Entry<String, double[]> entry2) {
-                // Разбиваем ключи на слова и сравниваем последние слова
-                String lastWord1 = getLastWord(entry1.getKey());
-                String lastWord2 = getLastWord(entry2.getKey());
-                int lastWordComparison = lastWord1.compareTo(lastWord2);
-                // Если последние слова не равны, возвращаем результат сравнения
-                if (lastWordComparison != 0) {
-                    return lastWordComparison;
-                }
-                // Если последние слова равны, сравниваем ключи целиком
-                return entry1.getKey().compareTo(entry2.getKey());
-            }
 
-            private String getLastWord(String str) {
-                // Разбиваем строку на слова и возвращаем последнее слово
-                String[] words = str.split(" ");
-                return words[words.length - 1];
+            public int compare(Map.Entry<String, double[]> entry1, Map.Entry<String, double[]> entry2) {
+                // Сравниваем первые слова в ключах
+                String firstWord1 = getFirstWord(entry1.getKey());
+                String firstWord2 = getFirstWord(entry2.getKey());
+                return firstWord1.compareTo(firstWord2);
             }
         };
         list.sort(comparator);
         return list;
+    }
+
+    public static String getFirstWord(String str) {
+        // Разбиваем строку на слова и возвращаем первое слово
+        String[] words = str.split(" ");
+        return words[0];
     }
 }
