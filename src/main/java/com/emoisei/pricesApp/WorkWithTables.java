@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,6 +17,8 @@ import java.util.*;
  * @author Maiseichyk_YA
  */
 public class WorkWithTables {
+    private static final Logger logger = LogManager.getLogger(WorkWithTables.class);
+
     static Map<String, double[]> ecSortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     static Map<String, double[]> coSortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     static Map<String, double[]> ilSortedMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -28,6 +33,7 @@ public class WorkWithTables {
         JsonNode json = getJsonFromSheet(sheet);
         getAllMaps(json);
         openAndWriteToFile(wb);
+        logger.info("Заканчиваем выполнение...");
     }
 
     public static Workbook openFile() {
@@ -35,6 +41,7 @@ public class WorkWithTables {
         try {
             FileInputStream fis = new FileInputStream("fileForInput.xlsx");
             workbook = WorkbookFactory.create(fis);
+            logger.info("Запуск приложения");
             return workbook;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -42,6 +49,7 @@ public class WorkWithTables {
     }
 
     public static JsonNode getJsonFromSheet(Sheet sheet) {
+        logger.info("Парсим json из листа");
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode arrayNode = mapper.createArrayNode();
         for (Row row : sheet) {
@@ -66,10 +74,13 @@ public class WorkWithTables {
     }
 
     public static void getAllMaps(JsonNode json) {
+        logger.info("Делим на мапы по странам и сабам");
+        int totalAmount = 0;
         for (JsonNode elem : json) {
             String name = elem.get("name").asText();
             double amount = elem.get("amount").asDouble();
             int quantity = elem.get("quantity").asInt();
+            totalAmount += quantity;
             int label = elem.get("label").asInt();
             if (checkIfSub(name)) {
                 name = normalizeSubName(name);
@@ -98,9 +109,12 @@ public class WorkWithTables {
                 }
             }
         }
+        logger.info("\u001B[1m\u001B[33mОбщее количество стеблей составляет: {}\u001B[0m", totalAmount);
+        logger.info("Разбили все по мапам, скоро результат");
     }
 
     private static String normalizeSubName(String name) {
+
         String firstWord = getFirstWord(name);
         String restOfString = name.substring(firstWord.length()).toLowerCase();
         return firstWord + restOfString;
@@ -132,6 +146,7 @@ public class WorkWithTables {
     }
 
     private static void clearSheet(Sheet sheet) {
+        logger.info("Очищаем лист для записи новых результатов");
         // Удаляем все строки, кроме первой (оставляем заголовок)
         for (int i = sheet.getLastRowNum(); i > 0; i--) {
             Row row = sheet.getRow(i);
@@ -300,6 +315,7 @@ public class WorkWithTables {
         }
         try (FileOutputStream fileOut = new FileOutputStream("fileForInput.xlsx")) {
             workbook.write(fileOut);
+            logger.info("Записали результаты на Sheet5");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
