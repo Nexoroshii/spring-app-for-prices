@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+
 /**
  * @author Maiseichyk_YA
  */
@@ -47,6 +48,7 @@ public class WorkWithTables {
             throw new RuntimeException(e);
         }
     }
+
 
     public static JsonNode getJsonFromSheet(Sheet sheet) {
         logger.info("Парсим json из листа");
@@ -139,7 +141,8 @@ public class WorkWithTables {
 
     private static boolean checkIfSub(String element) {
         //String regex2 = ".*[A-Z]{2,}";
-        String regex2 = "^[A-Z]{2,}\\s.*";
+        //String regex2 = "^[A-Z]{2,}\\s.*";
+        String regex2 = "^[A-Z0-9]{2,}\\s.*";
         boolean isMatch = element.matches(regex2);
         boolean isMatch2 = element.contains("+");
         return isMatch || isMatch2;
