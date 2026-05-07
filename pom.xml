@@ -9,20 +9,18 @@
     <url>http://maven.apache.org</url>
     <dependencies>
 
-
-        <!--  https://mvnrepository.com/artifact/com.google.code.gson/gson  -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
         </dependency>
-        <!--  https://mvnrepository.com/artifact/org.json/json  -->
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20240303</version>
         </dependency>
-        <!--  https://mvnrepository.com/artifact/commons-io/commons-io  -->
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -33,7 +31,7 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.15.2</version>
         </dependency>
-        <!--  https://mvnrepository.com/artifact/org.apache.poi/poi  -->
+
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
@@ -57,5 +55,15 @@
     </dependencies>
     <build>
         <finalName>spring-app2</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>
